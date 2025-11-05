@@ -1,0 +1,3 @@
+请将以下 SSH 公钥添加到 GitHub：
+
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGKHh0bi+ZlYf8wwNjS4B1c8mbKQ+LV9V9DJSgpMS6mF chongsheng007@github.com
