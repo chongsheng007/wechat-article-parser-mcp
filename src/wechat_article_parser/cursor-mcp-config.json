@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "wechat-article-parser": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--directory",
+        "/Users/changjp/my-first-mcp-server/src/wechat_article_parser",
+        "python",
+        "/Users/changjp/my-first-mcp-server/src/wechat_article_parser/wechat_server.py"
+      ]
+    }
+  }
+}
+

@@ -28,22 +28,64 @@ pip install -r requirements.txt
 
 ## 使用方法
 
-### 启动 MCP Server
+### 方式 1: 在 Cursor 中使用（推荐）
+
+#### 快速配置
+
+1. **复制配置文件**
+
+   编辑 `~/.cursor/mcp.json`（macOS/Linux）或 `%APPDATA%\Cursor\User\mcp.json`（Windows），添加以下配置：
+
+   ```json
+   {
+     "mcpServers": {
+       "wechat-article-parser": {
+         "command": "uv",
+         "args": [
+           "run",
+           "--directory",
+           "/path/to/your/project/src/wechat_article_parser",
+           "python",
+           "/path/to/your/project/src/wechat_article_parser/wechat_server.py"
+         ]
+       }
+     }
+   }
+   ```
+
+   **重要**: 将 `/path/to/your/project` 替换为你的实际项目路径！
+
+2. **重启 Cursor**
+
+   完全退出并重新启动 Cursor。
+
+3. **使用工具**
+
+   在 Cursor 聊天中直接说：
+   - "解析这篇文章: https://mp.weixin.qq.com/s/..."
+   - "提取这篇文章的元数据: https://mp.weixin.qq.com/s/..."
+   - "提取这篇文章的图片: https://mp.weixin.qq.com/s/..."
+
+#### 详细配置说明
+
+查看 [CURSOR_SETUP.md](CURSOR_SETUP.md) 获取完整配置指南。
+
+### 方式 2: 使用 MCP Inspector（开发/测试）
 
 ```bash
 # 使用 fastmcp dev（开发模式）
-uv run fastmcp dev src/wechat_article_parser/server.py
+cd src/wechat_article_parser
+uv run fastmcp dev wechat_server.py
 
-# 或直接运行
-uv run python src/wechat_article_parser/server.py
+# 访问 http://localhost:6274（使用带 token 的 URL）
 ```
 
-### 在 Cursor 中使用
+### 方式 3: 使用标准 MCP Inspector
 
-1. 配置 MCP Server（在 Cursor 设置中添加）
-2. 在聊天中直接使用：
-   - "解析这篇文章: https://mp.weixin.qq.com/s/..."
-   - "提取这篇文章的元数据: https://mp.weixin.qq.com/s/..."
+```bash
+cd src/wechat_article_parser
+./start_inspector.sh
+```
 
 ## 工具说明
 
