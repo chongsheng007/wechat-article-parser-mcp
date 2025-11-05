@@ -85,7 +85,11 @@ def register_extract_images_tool(mcp: FastMCP):
             "openWorldHint": False
         }
     )
-    def extract_article_images(input: ExtractArticleImagesInput) -> str:
+    def extract_article_images(
+        url: str,
+        include_cover: bool = True,
+        image_format: str = None
+    ) -> str:
         """
         提取微信公众号文章中的所有图片
         
@@ -111,5 +115,11 @@ def register_extract_images_tool(mcp: FastMCP):
             - 文章不存在: 提示检查 URL
             - 访问被拒绝: 建议在浏览器中打开链接
         """
-        return _extract_images_impl(input)
+        # 创建输入模型
+        input_data = ExtractArticleImagesInput(
+            url=url,
+            include_cover=include_cover,
+            image_format=image_format
+        )
+        return _extract_images_impl(input_data)
 

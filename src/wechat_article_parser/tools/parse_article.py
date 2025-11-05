@@ -71,7 +71,12 @@ def register_parse_article_tool(mcp: FastMCP):
             "openWorldHint": False  # 只能解析微信公众号文章
         }
     )
-    def parse_wechat_article_tool(input: ParseWeChatArticleInput) -> str:
+    def parse_wechat_article_tool(
+        url: str,
+        format: str = "markdown",
+        include_images: bool = True,
+        include_links: bool = True
+    ) -> str:
         """
         解析微信公众号文章，提取完整内容
         
@@ -100,5 +105,12 @@ def register_parse_article_tool(mcp: FastMCP):
             - 访问被拒绝: 建议在浏览器中打开链接
             - 解析失败: 提供部分解析的内容（如果有）
         """
-        return _parse_article_impl(input)
+        # 创建输入模型
+        input_data = ParseWeChatArticleInput(
+            url=url,
+            format=format,
+            include_images=include_images,
+            include_links=include_links
+        )
+        return _parse_article_impl(input_data)
 

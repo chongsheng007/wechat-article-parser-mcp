@@ -57,7 +57,7 @@ def register_extract_metadata_tool(mcp: FastMCP):
             "openWorldHint": False
         }
     )
-    def extract_article_metadata(input: ExtractArticleMetadataInput) -> str:
+    def extract_article_metadata(url: str) -> str:
         """
         快速提取微信公众号文章的元数据（不解析全文）
         
@@ -81,5 +81,7 @@ def register_extract_metadata_tool(mcp: FastMCP):
             - 文章不存在: 提示检查 URL
             - 访问被拒绝: 建议在浏览器中打开链接
         """
-        return _extract_metadata_impl(input)
+        # 创建输入模型
+        input_data = ExtractArticleMetadataInput(url=url)
+        return _extract_metadata_impl(input_data)
 
