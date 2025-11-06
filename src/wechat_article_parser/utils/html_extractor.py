@@ -96,8 +96,10 @@ class WeChatArticleExtractor:
             for selector in content_selectors:
                 content_elem = self.soup.select_one(selector)
                 if content_elem:
-                    # 处理图片懒加载
+                    # 处理图片懒加载，将 data-src 转换为 src
                     self._fix_lazy_images(content_elem)
+                    # 同时处理其他懒加载属性
+                    self._fix_all_lazy_images(content_elem)
                     return str(content_elem)
             
             return None
@@ -114,12 +116,38 @@ class WeChatArticleExtractor:
             
             img_tags = content_elem.find_all('img')
             for idx, img in enumerate(img_tags):
-                # 优先使用 src，如果没有则使用 data-src
-                img_url = img.get('src') or img.get('data-src') or img.get('data-original')
-                if img_url:
+                # 尝试多种方式获取图片 URL
+                img_url = (
+                    img.get('src') or 
+                    img.get('data-src') or 
+                    img.get('data-original') or
+                    img.get('data-src-s') or  # 微信有时使用这个属性
+                    img.get('data-lazy-src')  # 懒加载图片
+                )
+                
+                # 处理相对路径
+                if img_url and not img_url.startswith('http'):
+                    # 如果是相对路径，尝试转换为完整 URL
+                    if img_url.startswith('//'):
+                        img_url = 'https:' + img_url
+                    elif img_url.startswith('/'):
+                        img_url = 'https://mp.weixin.qq.com' + img_url
+                
+                # 处理微信图片的特殊格式（data:image 或 base64）
+                if img_url and img_url.startswith('data:image'):
+                    # base64 图片，保留原样
+                    pass
+                elif img_url:
+                    # 处理微信图片 URL（可能需要添加 Referer）
+                    # 微信图片通常使用 mmbiz.qpic.cn 或 mmbizurl.cn
+                    if 'mmbiz.qpic.cn' in img_url or 'mmbizurl.cn' in img_url:
+                        # 微信图片 URL，可能需要特殊处理
+                        # 但先返回原始 URL
+                        pass
+                    
                     images.append({
                         'url': img_url,
-                        'alt': img.get('alt', ''),
+                        'alt': img.get('alt', '') or img.get('title', ''),
                         'index': idx
                     })
             
@@ -176,6 +204,29 @@ class WeChatArticleExtractor:
         for img in element.find_all('img', {'data-src': True}):
             if not img.get('src'):
                 img['src'] = img.get('data-src', '')
+    
+    def _fix_all_lazy_images(self, element):
+        """修复所有类型的懒加载图片"""
+        for img in element.find_all('img'):
+            # 尝试从各种懒加载属性中获取图片 URL
+            lazy_url = (
+                img.get('data-src') or 
+                img.get('data-original') or
+                img.get('data-src-s') or
+                img.get('data-lazy-src')
+            )
+            
+            # 如果当前没有 src 或 src 是占位符，使用懒加载的 URL
+            current_src = img.get('src', '')
+            if lazy_url and (not current_src or 'data:image' in current_src or 'placeholder' in current_src.lower()):
+                img['src'] = lazy_url
+                
+                # 处理相对路径
+                if not lazy_url.startswith('http'):
+                    if lazy_url.startswith('//'):
+                        img['src'] = 'https:' + lazy_url
+                    elif lazy_url.startswith('/'):
+                        img['src'] = 'https://mp.weixin.qq.com' + lazy_url
     
     def extract_all(self) -> Dict:
         """提取所有信息"""
